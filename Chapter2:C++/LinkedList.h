@@ -40,5 +40,11 @@ public:
 
 	//Get the last node of the linked list
 	Node* getLastNode(Node* root);
+
+	//Determine if we have a loop in our linked list
+	bool hasCycle(Node* root);
+
+	//Sum both linked lists
+	Node* sumLists(Node* p, Node* q);
 };
 #endif

@@ -251,3 +251,112 @@ Node* LinkedList::getLastNode(Node* root){
 	return curr;
 }
 
+//Determine if we have a loop in our linked list
+bool LinkedList::hasCycle(Node* root){
+
+	if(root == nullptr || root->nextPtr == nullptr){
+		return false;
+	}
+
+	Node* slow = root;
+	Node* fast = root->nextPtr;
+
+	while(fast !=nullptr && fast->nextPtr != nullptr){
+		if(slow == fast){
+			return true;
+		}
+
+		slow = slow->nextPtr;
+		fast = fast->nextPtr->nextPtr;
+	}
+	return false;
+}
+
+
+//Sum both linked lists
+Node* LinkedList::sumLists(Node* p, Node* q){
+
+	if(p ==nullptr){
+		return q;
+	}
+	if(q == nullptr){
+		return p;
+	}
+
+	int delta = getSize(p) - getSize(q);
+
+	Node* small = delta > 0  ? q:p;
+	Node* large = delta > 0  ? p:q;
+
+	Node* answer = large;
+
+	int sum = 0;
+	int carry = 0;
+
+	while(small != nullptr){
+	
+		sum = small->data + large->data + carry;
+
+
+		//The range of the sum: [0,19]
+		if(sum < 10){
+			carry = 0;
+			large->data = sum;
+		}
+		else{
+			carry = 1;
+			int digit = sum % 10;
+			large->data = digit;
+		}
+
+		small = small->nextPtr;
+
+		if(small != nullptr){
+			large = large->nextPtr;
+		}
+
+	}
+
+
+	if(large->nextPtr != nullptr)
+	{
+		large = large->nextPtr;
+
+		while(large != nullptr){
+			sum = large->data + carry;
+
+			if(sum < 10){
+				carry = 0;
+				large->data = sum;
+			}
+			else{
+				carry = 1;
+				int digit = sum % 10;
+				large->data = digit;
+			}
+
+			if(large->nextPtr == nullptr){
+				break;
+			}
+			else{
+				large = large->nextPtr;
+			}
+		}
+	
+	}
+
+	
+	
+	if(carry == 1){
+		Node* lastNode = new Node(1);
+		large->nextPtr = lastNode;
+	}
+
+
+	return answer;
+
+
+}
+
+
+
