@@ -19,7 +19,7 @@ void setBit(int& num, int i, int bit);
 void printInBits(int number);
 
 //At position i, clear the bit
-void clearBit(int& num, int i);
+int clearBit(int& num, int i);
 
 //At position i of numOne, get the bit
 //At position j of numTwo, get the bit
@@ -169,11 +169,11 @@ void printInBits(int number) {
 }
 
 
-void clearBit(int& num, int i) {
+int clearBit(int& num, int i) {
 	//We just need to mask the specific bit position
 	int mask = ~(1 << i);
-
 	num = num & mask;
+	return num;
 }
 
 
