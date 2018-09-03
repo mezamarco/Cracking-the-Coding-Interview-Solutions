@@ -126,11 +126,12 @@ int getDistanceDFS(Node* start, Node* end) {
 
 
 int shortestPathDistanceBFS(Node* start, Node* end) {
-	
+
+	if(start == nullptr || end == nullptr)
+		return -1;    //Error	
 
 	//We will use a queue structure
 	std::queue<Node*> myQueue;
-
 
 	start->dist = 0;
 	start->isVisited = 1;
@@ -145,10 +146,9 @@ int shortestPathDistanceBFS(Node* start, Node* end) {
 		myQueue.pop();
 
 
-		if (current == end) {
+		if (current == end) 
 			return length;
-		}
-
+		
 
 		for (int i : current->adjVect) {
 			
@@ -158,15 +158,11 @@ int shortestPathDistanceBFS(Node* start, Node* end) {
 				child->isVisited = 1;
 				child->dist = length + 1;
 
-				myQueue.push(child);
-			
+				myQueue.push(child);			
 			}
-
 		}
-
-
-
 	}
+
 	return -1;
 }
 
@@ -198,7 +194,6 @@ bool validBST(Node* root) {
 
 //This is my helper function. This will traverse the BST and update my vector
 void inOrder(std::vector<int> & myVect, Node* current) {
-
 
 	if (current != nullptr) {
 		inOrder(myVect, current->left);
