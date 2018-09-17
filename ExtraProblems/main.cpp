@@ -61,9 +61,6 @@ int main()
 	int num = longestCommonSub(a, b, a.length() , b.length());
 	std::cout << num << "\n\n";
 
-	
-	
-	
 	//Lets determine the most repeated character
 	std::string word = "AABCDDBBBEAA"; 
 	consecutiveString(word);
@@ -79,11 +76,6 @@ int main()
 	std::cout <<"Brute for counting the steps: "  <<  val << "\n\n";
 	val = dynamicCountSteps(25);
 	std::cout << "Dynamic solution counting the steps: "<< val << "\n\n";
-
-
-
-
-
 
 
 	std::vector<int> myVect = { -2,1,-3,4,-1,2,1,-5,4 };
