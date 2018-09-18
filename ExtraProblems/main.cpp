@@ -6,7 +6,9 @@
 #include <ctime>
 #include <iterator>
 #include <unordered_map>
-
+#include <queue>
+#include <functional>
+#include <math.h>
 
 int const M = 5;
 int const N = 5;
@@ -43,10 +45,29 @@ int helperDataDecode(std::string data, int k, std::vector<int>& myVect);
 int longestCommonSub(std::string a, std::string b, int m, int n);
 int longestCommonSubDynamic(std::string a, std::string b, int m, int n);
 int longestCommonSubDynamic(std::string a, std::string b, int m, int n, int arr[M][M]);
+//Counting sort
+std::vector<int> countingSort(std::vector<int>& myVect, int maxRangeNum);
+//Get all the subsets of a given set
+std::vector<std::vector<int>> getAllSubsets(std::vector<int>& myVect);
+//Given a point, Determine the k closest point to the given point, we will get an array of points
+void printKClosetsPointsToGivenPoint(int k, int x, int y, std::vector<int>xCoordinates, std::vector<int>yCoordinates);
+//Get k largest element in the unsorted array, assume that we get a valid k
+int getKthLargest(std::vector<int>& myVect, int k);
+//What is the substring that is a valid palindrome?
+int longestPalindromeSubstring(std::string s);
 
 
-//Need to do:
-//largest palindrome substring//CHeck out my solution in leetcode
+
+
+
+//Tower Hopper
+//Knapsack problem
+//Universal tree
+//Negative matrix
+//Add up to 16
+
+
+
 
 
 int main()
@@ -61,6 +82,9 @@ int main()
 	int num = longestCommonSub(a, b, a.length() , b.length());
 	std::cout << num << "\n\n";
 
+	
+	
+	
 	//Lets determine the most repeated character
 	std::string word = "AABCDDBBBEAA"; 
 	consecutiveString(word);
@@ -76,6 +100,25 @@ int main()
 	std::cout <<"Brute for counting the steps: "  <<  val << "\n\n";
 	val = dynamicCountSteps(25);
 	std::cout << "Dynamic solution counting the steps: "<< val << "\n\n";
+
+	//Get all the subset of the given vector
+	std::vector<int> myVector = { 1,2,3 };
+	std::vector<std::vector<int>> subsetVect = getAllSubsets(myVector);
+	std::cout << "Printing all the subsets of: [1,2,3].\n";
+	for (int i = 0; i < subsetVect.size(); i++)
+	{
+		for (int num : subsetVect[i])
+			std::cout << " " << num << "   ";
+		std::cout << "\n";
+	}
+
+	//Find the first 4 points that are closest to the origin
+	std::vector<int> xCor = { 3,3,7,5,4,35,5,44};
+	std::vector<int> yCor = { 3,9,7,5,4,45,2,7};
+	printKClosetsPointsToGivenPoint(4, 5, 5, xCor, yCor);
+
+
+
 
 
 	std::vector<int> myVect = { -2,1,-3,4,-1,2,1,-5,4 };
@@ -441,4 +484,141 @@ int dynamicCountSteps(int n, std::vector<int>& myVect) {
 		return myVect[n];
 	
 	}	
+}
+
+
+
+//What is the substring that is a valid palindrome?
+int longestPalindromeSubstring(std::string s){
+	
+	std::unordered_map<char, int> myMap;
+
+	for (char ch : s)
+		++myMap[ch];
+
+	std::unordered_map<char, int>::iterator it = myMap.begin();
+	std::unordered_map<char, int>::iterator itEnd = myMap.end();
+
+	int count = 0;
+	bool usedAnOddCharacter = false;
+
+	while (it != itEnd)
+	{
+		if (it->second % 2 == 0)
+			count = count + it->second;
+		else {
+			count = count + it->second - 1;
+
+			if (!usedAnOddCharacter)
+			{
+				++count;
+				usedAnOddCharacter = true;
+			}
+		}
+		++it;
+	}
+	return count;
+}
+
+
+//Counting sort
+std::vector<int> countingSort(std::vector<int>& myVect, int maxRangeNum) {
+
+	//Use the max number plus one to build the second vector
+	std::vector<int> secondVect(maxRangeNum + 1, 0);
+	
+	//We will store our sorted vector in answerVect
+	std::vector<int> answerVect(myVect.size(), 0);
+
+	//Get a frequency vector
+	for (int num : myVect)
+		secondVect[num] += 1;
+
+	//Update the frequency vector with the sum of previous and current index
+	for (int i = 1; i < secondVect.size(); i++)
+		secondVect[i] = secondVect[i - 1] + secondVect[i];
+
+	//Using the main vector and the freqVect we will organize the main vector
+	//Start from the back of the main vector
+	for (int i = myVect.size() - 1; i >= 0; i--)
+	{
+		//Get the current element 
+		int currentNum = myVect[i];
+
+		//Determine the location of the current element usind the second vector
+		int index = secondVect[currentNum];
+		//Decrement the index of the second vector
+		--secondVect[currentNum];
+		
+		answerVect[index-1] = currentNum;
+	}
+
+	return answerVect;
+}
+
+//Get all the subsets of a given set
+std::vector<std::vector<int>> getAllSubsets(std::vector<int>& myVect) {
+	
+	std::vector<std::vector<int>> subs(1, std::vector<int>());
+
+	//For every possible subset size
+	for (int i = 0; i < myVect.size(); i++)
+	{
+		int n = subs.size();
+
+		for (int j = 0; j < n; j++) {
+			subs.push_back(subs[j]);
+			subs.back().push_back(myVect[i]);
+		}
+	}
+	return subs;
+}
+
+//Given a point, Determine the k closest point to the given point, we will get an array of points
+void printKClosetsPointsToGivenPoint(int k,int x, int y, std::vector<int>xCoordinates, std::vector<int>yCoordinates) {
+	
+	std::priority_queue<int, std::vector<int>, std::greater<int> > pq; //Min heap
+	//std::priority_queue<int, std::vector<int>, std::less<int> > pq;//Max heap
+
+	//Key: distance and the value: index
+	std::unordered_map<int, int> myMap;
+	
+	std::cout << "\n\n\n";
+
+	for (int i = 0; i < xCoordinates.size(); i++)
+	{
+		int distance = std::pow((xCoordinates[i] - x),2) + std::pow((yCoordinates[i] - y), 2);
+		std::cout << "x:" << xCoordinates[i] << ", y: " << yCoordinates[i] << " -> distance: " << distance << "\n";
+
+		myMap[distance] = i;
+		pq.push(distance);
+	}
+
+	std::cout << "\nThe " << k << " closest points of: (" << x << "," << y << "):\n";
+	for (int m = 0; m < k; m++)
+	{
+		int index = myMap[pq.top()];
+		std::cout << "(" << xCoordinates[index] << "," << yCoordinates[index] << ") -> " << pq.top() << "\n";
+		//Just in case we have repeated keys and values
+		myMap.erase(pq.top());
+
+		pq.pop();
+	}
+	std::cout << "\n\n\n";
+
+}
+
+//Get k largest element in the unsorted array, assume that we get a valid k
+int getKthLargest(std::vector<int>& myVect, int k) {
+	std::priority_queue<int, std::vector<int>, std::less<int>> pq;
+	for (int num : myVect)
+		pq.push(num);
+
+	int answer;
+	for (int i = 0; i < k; k++)
+	{
+		answer = pq.top();
+		pq.pop();
+	}
+	return answer;
 }
