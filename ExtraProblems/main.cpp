@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <queue>
 #include <functional>
+#include <stack>
 #include <math.h>
 
 int const M = 5;
@@ -55,17 +56,24 @@ void printKClosetsPointsToGivenPoint(int k, int x, int y, std::vector<int>xCoord
 int getKthLargest(std::vector<int>& myVect, int k);
 //What is the substring that is a valid palindrome?
 int longestPalindromeSubstring(std::string s);
+//Sorted matrix, how many negative elements do we have? Find a better solution than O(n^2)
+int numOfNegativesInMatrix(int arr[N][M]);
+//Find all the sets that add up to the given target
+int findSetsThatAddToTarget(std::vector<int>& myVect, int target);
+int helperFindSets(std::vector<int>&myVect, int target, int i, std::unordered_map<std::string, int>& myMap);
+// A utility function that returns maximum of two integers 
+int max(int a, int b);
+// Returns the maximum value that can be put in a knapsack of capacity W 
+int knapSack(int W, std::vector<int>& wt,std::vector<int>& val, int n);
+//Top k most frequent elements
+std::vector<int> topKFrequent(std::vector<int>& nums, int k);
+//Find the largest restangle in the given histogram
+int largestRectangularArea(std::vector<int>& myVect);
+//Can we jump all the way until the last index?
+bool jumpToLastIndex(std::vector<int>& nums);
 
-
-
-
-
-//Tower Hopper
-//Knapsack problem
-//Universal tree
-//Negative matrix
-//Add up to 16
-
+//Count the number of single values subtrees
+//bool universalSubtreeCount(Node* root, int & count);
 
 
 
@@ -78,13 +86,9 @@ int main()
 	std::string a = "AGGTAB";
 	std::string b = "GXTXAYB";
 
-
 	int num = longestCommonSub(a, b, a.length() , b.length());
 	std::cout << num << "\n\n";
 
-	
-	
-	
 	//Lets determine the most repeated character
 	std::string word = "AABCDDBBBEAA"; 
 	consecutiveString(word);
@@ -105,7 +109,7 @@ int main()
 	std::vector<int> myVector = { 1,2,3 };
 	std::vector<std::vector<int>> subsetVect = getAllSubsets(myVector);
 	std::cout << "Printing all the subsets of: [1,2,3].\n";
-	for (int i = 0; i < subsetVect.size(); i++)
+	for (unsigned int i = 0; i < subsetVect.size(); i++)
 	{
 		for (int num : subsetVect[i])
 			std::cout << " " << num << "   ";
@@ -118,7 +122,21 @@ int main()
 	printKClosetsPointsToGivenPoint(4, 5, 5, xCor, yCor);
 
 
+	//Lets test out our Knapsack solution
+	std::vector<int> valueVect = { 5,8,22,2,13 };
+	std::vector<int> weight = { 10,15,33,4,66 };
+	int capacity = 55;
+	int vectSize = valueVect.size();
+	int myAns = knapSack(capacity, weight, valueVect, vectSize);
+	std::cout << "Knapsack problem: \nWe have a capacity of: " << capacity << "\n";
+	for (int i = 0; i < valueVect.size(); i++)
+		std::cout << "Weight: " << weight[i] << "\t  Value: " << valueVect[i] << "\n";
+	std::cout << "The maximum value that we can get is: " << myAns << "\n\n";
 
+
+	std::vector<int> dataVector = { 1,2,3,4,5,3,3,2 };
+	int rectangleArea = largestRectangularArea(dataVector);
+	std::cout << "The max area that we found is: " << rectangleArea << "\n\n";
 
 
 	std::vector<int> myVect = { -2,1,-3,4,-1,2,1,-5,4 };
@@ -143,7 +161,7 @@ int indexOfFirstUniqueCharacter(std::string word) {
 		myVect[(int)ch] += 1;
 	}
 
-	for (int i = 0; i < word.size(); i++)
+	for (unsigned int i = 0; i < word.size(); i++)
 	{
 		if (myVect[(int)word[i]] == 1)
 			return i;
@@ -181,7 +199,7 @@ bool targetMultiplication(std::vector<int>& myVect, int target) {
 
 	std::unordered_map<int, int> myMap;
 
-	for (int i = 0; i < myVect.size(); i++)
+	for (unsigned int i = 0; i < myVect.size(); i++)
 	{	
 		int currNum = myVect[i];
 
@@ -587,7 +605,7 @@ void printKClosetsPointsToGivenPoint(int k,int x, int y, std::vector<int>xCoordi
 
 	for (int i = 0; i < xCoordinates.size(); i++)
 	{
-		int distance = std::pow((xCoordinates[i] - x),2) + std::pow((yCoordinates[i] - y), 2);
+		int distance = pow((xCoordinates[i] - x),2) + pow((yCoordinates[i] - y), 2);
 		std::cout << "x:" << xCoordinates[i] << ", y: " << yCoordinates[i] << " -> distance: " << distance << "\n";
 
 		myMap[distance] = i;
@@ -622,3 +640,218 @@ int getKthLargest(std::vector<int>& myVect, int k) {
 	}
 	return answer;
 }
+
+//Sorted matrix, how many negative elements do we have? Find a better solution than O(n^2)
+int numOfNegativesInMatrix(int arr[N][M]) {
+
+	//Run time : O(N + M)
+	int count = 0;
+	int i = 0;//Starting from the first row
+	int j = M - 1;//Starting from the last column
+
+	while (j >= 0 && i < N) {
+
+		if (arr[i][j] < 0)
+		{
+			count = count + (j + 1);
+			i++;
+		}
+		else
+			--j;
+	}
+	return count;
+
+}
+
+
+
+//Find all the sets that add up to the given target
+int findSetsThatAddToTarget(std::vector<int>& myVect, int target) {
+	std::unordered_map<std::string, int> myMap;
+	return helperFindSets(myVect, target, myVect.size() - 1, myMap);
+}
+int helperFindSets(std::vector<int>&myVect, int target, int i, std::unordered_map<std::string, int>& myMap) {
+	std::string key = std::to_string(target) + ":" + std::to_string(i);
+	int answer;
+
+	if (myMap.find(key) != myMap.end())
+		return myMap[key];
+
+	if (target == 0)
+		return 1;
+	else if (target < 0)
+		return 0;
+	else if (i < 0)
+		return 0;
+	else if (target < myVect[i])
+		answer = helperFindSets(myVect, target, i - 1, myMap);
+	else
+		answer = (helperFindSets(myVect, target - myVect[i], i - 1, myMap)
+				+helperFindSets(myVect, target, i - 1, myMap));
+
+	myMap[key] = answer;
+	return answer;
+}		
+
+
+
+// A utility function that returns maximum of two integers 
+int max(int a, int b) { 
+	return (a > b) ? a : b; 
+}
+
+// Returns the maximum value that can be put in a knapsack of capacity W 
+int knapSack(int W, std::vector<int>& wt, std::vector<int>& val, int n)
+{	
+	int** K = new int*[n+1];
+	for (int i = 0; i < n+1; i++)
+		K[i] = new int[W+1];
+
+	// Build table K[][] in bottom up manner 
+	for (int i = 0; i <= n; i++)
+	{
+		for (int w = 0; w <= W; w++)
+		{
+			if (i == 0 || w == 0)
+				K[i][w] = 0;
+			else if (wt[i - 1] <= w)
+				K[i][w] = max(val[i - 1] + K[i - 1][w - wt[i - 1]], K[i - 1][w]);
+			else
+				K[i][w] = K[i - 1][w];
+		}
+	}
+
+	int answer = K[n][W];
+	//deallocate the array
+	for (int i = 0; i < n+1; i++)
+		delete[] K[i];
+	delete[] K;
+
+	return answer;
+}
+
+std::vector<int> topKFrequent(std::vector<int>& nums, int k) {
+	std::unordered_map<int, int> myMap;
+	for (int num : nums)
+		++myMap[num];
+
+
+	std::vector<int> answer;
+	// pair<first, second>: first is frequency,  second is number
+	std::priority_queue<std::pair<int, int>> pq;
+
+	std::unordered_map<int, int>::iterator it = myMap.begin();
+	std::unordered_map<int, int>::iterator itEnd = myMap.end();
+
+	while (it != itEnd) {
+		pq.push(std::make_pair(it->second, it->first));
+
+		if (pq.size() > (int)myMap.size() - k) {
+			answer.push_back(pq.top().second);
+			pq.pop();
+		}
+		++it;
+	}
+	return answer;
+}
+
+
+
+
+//Find the largest restangle in the given histogram
+int largestRectangularArea(std::vector<int>& myVect) {
+	
+	if (myVect.size() == 0)
+		return 0;
+	if (myVect.size() == 1)
+		return myVect[0];
+
+	std::stack<int> myStack;
+	int max = 0;
+	unsigned int i = 0;
+	int currentMax = 0;
+
+	while (i < myVect.size()) {
+	
+		if(myStack.empty() || myVect[myStack.top()] <= myVect[i])
+		{
+			myStack.push(i);
+			i++;
+		}
+		else {
+			currentMax = myStack.top();
+			myStack.pop();
+
+			int area = myStack.empty() ? myVect[currentMax] * i : myVect[currentMax] * (myStack.empty() ? i-1: i-1-myStack.top()) ;
+			if (area > max)
+				max = area;
+		}
+	
+	}
+	while (!myStack.empty()) {
+		currentMax = myStack.top();
+		myStack.pop();
+
+		int area = myStack.empty() ? myVect[currentMax] * i : myVect[currentMax] * (myStack.empty() ? i - 1 : i - 1 - myStack.top());
+		if (area > max)
+			max = area;
+	}
+	return max;
+
+}
+
+
+//Can we jump all the way until the last index?
+bool jumpToLastIndex(std::vector<int>& nums) {
+	int size = nums.size();
+	int step = nums[0];
+
+	for (int i = 1; i < size; i++) {
+		--step;
+
+		if (step < 0)
+			return false;
+
+		if (nums[i] > step)
+			step = nums[i];
+	}
+	return true;
+
+}
+
+
+/*
+// This function increments count by number of single
+// valued subtrees under root. It returns true if subtree
+// under root is Singly, else false.
+bool universalSubtreeCount(Node* root, int &count)
+{
+	// Return false to indicate NULL
+	if (root == NULL)
+	return true;
+
+	// Recursively count in left and right subtrees also
+	bool left = countSingleRec(root->left, count);
+	bool right = countSingleRec(root->right, count);
+
+	// If any of the subtrees is not singly, then this
+	// cannot be singly.
+	if (left == false || right == false)
+	return false;
+
+	// If left subtree is singly and non-empty, but data
+	// doesn't match
+	if (root->left && root->data != root->left->data)
+		return false;
+
+	// Same for right subtree
+	if (root->right && root->data != root->right->data)
+		return false;
+
+	// If none of the above conditions is true, then
+	// tree rooted under root is single valued, increment
+	// count and return true.
+	count++;
+	return true;
+}
+*/
